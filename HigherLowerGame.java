@@ -43,6 +43,9 @@ public class HigherLowerGame extends JFrame implements ActionListener {
 
 		Random generator = new Random();
 		randomNumber = generator.nextInt(50);
+		
+		System.out.println(randomNumber);
+		
 		(timer = new Counter()).execute();
 	}
 
@@ -53,6 +56,10 @@ public class HigherLowerGame extends JFrame implements ActionListener {
 			response.setText("CORRECT!!");
 			timer.cancel(true);
 			timer = null;
+			int timeTaken = 30-(Integer.parseInt(countdown.getText()));
+			JOptionPane.showMessageDialog(null, "Congratulations, you took "
+					+timeTaken+" secs!!",
+					"GAME OVER", JOptionPane.ERROR_MESSAGE);
 			return true;
 		}
 		else if (guess>randomNumber){

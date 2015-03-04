@@ -44,8 +44,6 @@ public class HigherLowerGame extends JFrame implements ActionListener {
 		Random generator = new Random();
 		randomNumber = generator.nextInt(50);
 		
-		System.out.println(randomNumber);
-		
 		(timer = new Counter()).execute();
 	}
 
@@ -60,7 +58,7 @@ public class HigherLowerGame extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Congratulations, you took "
 					+timeTaken+" secs!!",
 					"GAME OVER", JOptionPane.ERROR_MESSAGE);
-			return true;
+			System.exit(0);
 		}
 		else if (guess>randomNumber){
 			response.setText("LOWER!!");

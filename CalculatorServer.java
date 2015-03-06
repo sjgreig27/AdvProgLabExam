@@ -19,21 +19,27 @@ public class CalculatorServer{
 				if(message == null) {
 					break;
 				}
-				else if(message.startsWith("[0-9]+")) {
-					String [] calculation = message.trim().split(",");
-					int operand1 = Integer.parseInt(calculation[0]);
-					int operand2 = Integer.parseInt(calculation[1]);
-					int result = 0;
-					if (calculation[2].equals("+")){
-						result=operand1+operand2;
-						response = ""+result;
-					}
-					else if (calculation[2].equals("-")){
-						result=operand1-operand2;
-						response = ""+result;
-					}
-					else{
-						response = "OPERATION NOT SUPPORTED";
+				else if(message.startsWith("CALCULATE:")) {
+					String [] input = message.trim().split("[:]");
+					String[] calculation = input[1].trim().split("[,]");
+					try{
+						int operand1 = Integer.parseInt(calculation[0]);
+						int operand2 = Integer.parseInt(calculation[1]);
+						int result = 0;
+						if (calculation[2].equals("+")){
+							result=operand1+operand2;
+							response = "ANSWER: "+result;
+						}
+						else if (calculation[2].equals("-")){
+							result=operand1-operand2;
+							response = "ANSWER: "+result;
+						}
+						else{
+							response = "OPERATION NOT SUPPORTED";
+						}
+					}	
+					catch(NumberFormatException x){
+						response = "FORMAT OF CALCULATION INCORRECT"; 
 					}
 				}
 				else if (message.startsWith("EXIT")){

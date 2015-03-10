@@ -1,110 +1,130 @@
-import java.awt.event.*;
 import java.awt.GridBagLayout;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Random;
 
-public class HigherLowerGame extends JFrame implements ActionListener {
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
-	private JButton submitButton;
-	private JTextField userEntry;
-	private JLabel countdown, response;
+
+
+public class HigherLowerGame extends JFrame implements ActionListener{
+
 	private int randomNumber;
+	private JButton submitButton;
+	private JLabel response, countdown;
+	private JTextField userEntry;
 	private Counter timer;
-
+	
 	public HigherLowerGame(){
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new GridBagLayout());
-
-		//Add Response label
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLayout(new GridBagLayout());
+		
 		response = new JLabel();
-		response.setText("BEGIN!!");
-		getContentPane().add(response);
-
-		//Add submit Button
+		response.setText("Begin!");
+		this.getContentPane().add(response);
+		
 		submitButton = new JButton("Submit");
-		submitButton.setActionCommand("Submit");
 		submitButton.addActionListener(this);
-		getContentPane().add(submitButton);
+		submitButton.setActionCommand("Submit");
 		submitButton.setEnabled(true);
-
-		//Add userEntry field
-		userEntry = new JTextField(10);
-		userEntry.setText("0");
-		getContentPane().add(userEntry);
-
-		//Add the countdown
+		this.getContentPane().add(submitButton);
+		
+		userEntry = new JTextField(20);
+		userEntry.setText("");
+		this.getContentPane().add(userEntry);
+		
 		countdown = new JLabel();
 		countdown.setText("30");
-		getContentPane().add(countdown);
-
+		this.getContentPane().add(countdown);
+		
 		pack();
-		setVisible(true);
-
-		Random generator = new Random();
-		randomNumber = generator.nextInt(50);
+		this.setVisible(true);
+		
+		Random random = new Random();
+		randomNumber = random.nextInt(50);
 		
 		(timer = new Counter()).execute();
+		
 	}
-
-	public boolean checkEntry(){
-		String entry = userEntry.getText();
-		int guess = Integer.parseInt(entry.trim());
-		if (guess==randomNumber){
-			response.setText("CORRECT!!");
-			timer.cancel(true);
-			timer = null;
-			int timeTaken = 30-(Integer.parseInt(countdown.getText()));
-			JOptionPane.showMessageDialog(null, "Congratulations, you took "
-					+timeTaken+" secs!!",
-					"GAME OVER", JOptionPane.ERROR_MESSAGE);
-			System.exit(0);
+	
+	public boolean checkGuess(){
+		try{
+			Integer guess = Integer.parseInt(userEntry.getText().trim());
+			if (guess==randomNumber){
+				response.setText("CORRECT!!");
+				timer.cancel(true);
+				timer=null;
+				int timeRemaining = Integer.parseInt(countdown.getText().trim());
+				int timeTaken = 30-timeRemaining;
+				System.out.println ("Congratulations!! You took "+timeTaken+" secs!");
+				return true;
+			}
+			else if(guess<randomNumber) {
+				response.setText("LOWER!!");
+				userEntry.setText("");
+				return false;
+			}
+			else{ //guess>randomNumber
+				response.setText("HIGHER!!");
+				userEntry.setText("");
+				return false;
+			}
+			
 		}
-		else if (guess>randomNumber){
-			response.setText("LOWER!!");
+		catch(NumberFormatException nfx){
+			response.setText("Incorrect Format");
+			userEntry.setText("");
+			return false;
 		}
-		else if (guess<randomNumber){
-			response.setText("HIGHER!!");
-		}
-		return true;
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource()==submitButton){
-			checkEntry();
+			if (checkGuess()){
+				System.exit(0);
+			}
 		}
+		
 	}
-
-	private class Counter extends SwingWorker<Void, Integer>{
+	
+	protected class Counter extends SwingWorker<Void, Integer>{
 
 		@Override
-		public Void doInBackground() throws Exception {
-			Integer count = Integer.parseInt(countdown.getText());
-			boolean remainingTime = true;
-			while(remainingTime){
-				if (count!=0){
-					count--;
-					publish(count);
-					Thread.sleep(1000);
-				}
-				else{
-					JOptionPane.showMessageDialog(null, "Out of Time!!",
-							"GAME OVER", JOptionPane.ERROR_MESSAGE);
-					remainingTime= false;
-					this.cancel(true);
-					System.exit(0);
+		protected Void doInBackground() throws Exception {
+			try{
+				Integer time = Integer.parseInt(countdown.getText().trim());
+				boolean timeRemaining = true;
+				while (timeRemaining){
+					if (time!=0){
+						time--;
+						publish(time);
+						Thread.sleep(1000);
+					}
+					else{
+						System.out.println ("OUT OF TIME!!");
+						this.cancel(true);
+						System.exit(0);
+					}
 				}
 			}
+			catch (Exception e){}
 			return null;
 		}
-
-		public void process(List<Integer> time){
-			countdown.setText(""+time.get(time.size()-1));
+		
+		protected void process(List<Integer> time){
+			countdown.setText(""+time.get((time.size()-1)));
 		}
+		
 	}
-
-	public static void main (String[]args){
+	
+	public static void main (String[] args){
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
 				new HigherLowerGame();
